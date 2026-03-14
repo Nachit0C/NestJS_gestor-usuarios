@@ -1,0 +1,46 @@
+services:
+  app:
+    build:
+      context: .
+      target: development
+    container_name: nestjs_app_users_manager
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app_network
+    command: npm run start:dev
+ 
+  postgres:
+    image: postgres:16-alpine
+    container_name: nestjs_postgres_users
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_HOST: ${DB_HOST}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+ 
+volumes:
+  postgres_data:
+ 
+networks:
+  app_network:
+    driver: bridge
