@@ -1,6 +1,6 @@
 import { IsEmail, IsString, MinLength, MaxLength } from 'class-validator';
 
-export class CreateUserDto {
+export class RegisterDto {
   @IsString()
   @MaxLength(50, { message: 'El nombre no puede superar los 50 caracteres' })
   name: string;

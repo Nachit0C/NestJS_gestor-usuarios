@@ -6,10 +6,13 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -18,6 +21,12 @@ export class UsersController {
   @Get()
   getUsers(): Promise<User[]> {
     return this.usersService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getProfile(@Request() req: { user: { id: number; email: string } }) {
+    return req.user;
   }
 
   @Get(':id')
